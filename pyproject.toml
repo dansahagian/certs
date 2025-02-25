@@ -1,0 +1,9 @@
+[project]
+name = "certs"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.8"
+dependencies = [
+    "certifi>=2024.2.2"
+]
