@@ -1,14 +1,15 @@
-import ssl
 import socket
-import certifi
+import ssl
 from datetime import datetime
 from urllib.parse import urlparse
 
+import certifi
+
 # ANSI color codes
-GREEN = '\033[92m'
-RED = '\033[91m'
-RESET = '\033[0m'
-BLUE = '\033[94m'
+GREEN = "\033[92m"
+RED = "\033[91m"
+RESET = "\033[0m"
+BLUE = "\033[94m"
 
 
 def check_cert_expiration(url):
@@ -23,14 +24,14 @@ def check_cert_expiration(url):
     """
     try:
         # Clean and parse URL
-        if not url.startswith(('http://', 'https://')):
-            url = 'https://' + url
+        if not url.startswith(("http://", "https://")):
+            url = "https://" + url
 
         parsed_url = urlparse(url)
         hostname = parsed_url.netloc or parsed_url.path
 
         # Remove www. if present
-        hostname = hostname.replace('www.', '')
+        hostname = hostname.replace("www.", "")
 
         # Create SSL context with certifi's certificates
         context = ssl.create_default_context(cafile=certifi.where())
@@ -41,7 +42,10 @@ def check_cert_expiration(url):
                 cert = ssock.getpeercert()
 
                 # Get expiration date
-                expire_date = datetime.strptime(cert['notAfter'], '%b %d %H:%M:%S %Y %Z')
+                expire_date = datetime.strptime(
+                    cert["notAfter"],  # pyright: ignore
+                    "%b %d %H:%M:%S %Y %Z",
+                )
                 days_remaining = (expire_date - datetime.now()).days
 
                 return url, expire_date, days_remaining
@@ -75,7 +79,7 @@ def main():
         print(f"Attempting connection to: {url}")
         url, expire_date, days_remaining = check_cert_expiration(url)
 
-        if expire_date:
+        if expire_date and days_remaining:
             print(f"{GREEN}✓ Success!{RESET}")
             print(f"{BLUE}Certificate Information:{RESET}")
             print(f"  URL: {url}")
